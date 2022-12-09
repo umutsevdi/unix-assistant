@@ -9,16 +9,13 @@
 
 #define disp_width 128
 #define disp_height 64
+#define DISP_WIDTH_NUMBER_OF_CHARACTERS 21
 
 SSD1306 display(disp_width, disp_height); // instantiate  an object
 
-// =============== Function prototype ================
-
 void loop(void);
 void display_close(void);
-void color_test();
 
-// ======================= Main ===================
 int main(int argc, char **argv) {
   if (!bcm2835_init()) {
     printf("Error 1201: init bcm2835 library\r\n");
@@ -27,7 +24,7 @@ int main(int argc, char **argv) {
   printf("OLED Begin\r\n");
   display.OLEDbegin();             // initialize the OLED
   display.OLEDFillScreen(0xF0, 0); // splash screen bars
-  bcm2835_delay(500);
+  bcm2835_delay(200);
 
   loop();
   display_close();
@@ -59,7 +56,7 @@ void loop() {
   while (strncmp(str, "exit", 4) != 0) {
     bzero(str, sizeof(str));
     fgets(str, sizeof(str), stdin);
-    char *output = (char *)malloc(sizeof(char) * 1024);
+    str[99] = '\0';
     bool is_clear = strncmp(str, "clear", 5) == 0;
     if ((y_index * 8 % 64 == 0 && y_index >= 8) || is_clear) {
       display.OLEDclearBuffer();
@@ -71,36 +68,28 @@ void loop() {
       }
     }
     display.setCursor(0, y_index * 8 % 64);
-    int buffer_size = proc_exec(str, output);
+    char *output = proc_exec(str, PROC_UTIL_BUFFER_SIZE);
+    int output_len = strnlen(output, PROC_UTIL_BUFFER_SIZE);
+    display.print("$ ");
     display.print(str);
     display.print(output);
-    printf("%4d> %s \n",buffer_size, output);
+    printf("%s \n", output);
     free(output);
-    y_index += 1 + buffer_size / 64;
+    y_index += 2 + output_len / DISP_WIDTH_NUMBER_OF_CHARACTERS;
     display.OLEDupdate();
   }
   printf("exiting\n");
-}
-
-void color_test() {
-  int i;
-  for (i = 0; i < 100; i++) {
-    display.setCursor(0, i * 8 % 64);
-    char str[100];
-    sprintf(str, "%d", i);
-    display.print(str);
-    delay(100);
-    display.OLEDupdate(); // write to active buffer
-    if (i * 8 % 64 == 0) {
-      display.OLEDclearBuffer();
-    }
-  }
+  display.OLEDclearBuffer();
+  display.setCursor(0, 0);
+  display.print("Bye...");
+  display.OLEDupdate();
+  delay(1000);
 }
 
 void display_close() {
-  display.OLEDclearBuffer(); // Clear active buffer
-  display.OLEDupdate();      // write to active buffer
-  delay(100);
+  display.OLEDFillScreen(0xF0, 0); // splash screen bars
+  delay(200);
+  display.OLEDclearBuffer();
   display.OLEDPowerDown(); // Switch off display
   bcm2835_close();         // Close the library
   printf("OLED End\r\n");
