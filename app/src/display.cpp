@@ -1,14 +1,18 @@
 #include "display.h"
 #include "proc_util.h"
+#include <cstdio>
+#include <cstring>
 
+pid_t pid;
 SSD1306 display(disp_width, disp_height); // instantiate  an object
 
-int disp_setup() {
+int disp_setup(pid_t p) {
+  pid = p;
   if (!bcm2835_init()) {
-    printf("Error 1201: init bcm2835 library\r\n");
+    printf("%i\tError 1201: init bcm2835 library\n", pid);
     return -1;
   }
-  printf("OLED Begin\r\n");
+  printf("%i\tOLED Begin\n", pid);
   display.OLEDbegin();             // initialize the OLED
   display.OLEDFillScreen(0xF0, 0); // splash screen bars
   bcm2835_delay(200);
@@ -39,8 +43,12 @@ void disp_loop(int read_pipe) {
 
   while (strncmp(str, "exit", 4) != 0) {
     bzero(str, sizeof(str));
-    fgets(str, sizeof(str), stdin);
-    str[99] = '\0';
+    // read input from pipe
+    int len = read(read_pipe, str, sizeof(str));
+    if (len <= 0) {
+      continue;
+    }
+    //    str[len] = '\0';
     bool is_clear = strncmp(str, "clear", 5) == 0;
     if ((y_index * 8 % 64 == 0 && y_index >= 8) || is_clear) {
       display.OLEDclearBuffer();
@@ -57,12 +65,12 @@ void disp_loop(int read_pipe) {
     display.print("$ ");
     display.print(str);
     display.print(output);
-    printf("%s \n", output);
+    printf("%i\t%s \n", pid, output);
     free(output);
     y_index += 2 + output_len / DISP_WIDTH_NUMBER_OF_CHARACTERS;
     display.OLEDupdate();
   }
-  printf("exiting\n");
+  printf("%i\tExiting\n", pid);
   display.OLEDclearBuffer();
   display.setCursor(0, 0);
   display.print("Bye...");
@@ -76,5 +84,5 @@ void disp_close() {
   display.OLEDclearBuffer();
   display.OLEDPowerDown(); // Switch off display
   bcm2835_close();         // Close the library
-  printf("OLED End\r\n");
+  printf("%i\tConnection with OLED screen is closed\n", pid);
 }

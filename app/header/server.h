@@ -18,6 +18,6 @@
  * @param write_pipe, write end of the pipe to deliver messages
  * @param int port
  */
-void sv_listen(int write_pipe, int port);
+void sv_listen(pid_t pid, int write_pipe, int port);
 
 #endif

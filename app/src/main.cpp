@@ -13,19 +13,19 @@ int main(int argc, char **argv) {
   pid_t pid = fork();
 
   if (!pid) {
-    if (!disp_setup()) {
+    close(sv_pipe[0]);
+    printf("%i\tStarting TCP server at :%d\n", getpid(), PORT);
+    sv_listen(getpid(),sv_pipe[1], PORT);
+    // parent
+  } else {
+    if (!disp_setup(getpid())) {
       printf("%i\tStarting up display\n", getpid());
       close(sv_pipe[1]);
       disp_loop(sv_pipe[0]);
       disp_close();
     } else {
-      perror("Failed to setup OLED display\n");
+      printf("%i\tFaield to setup OLED display\n", getpid());
     }
-    // parent
-  } else {
-    close(sv_pipe[0]);
-    printf("%i\tStarting TCP server at :%d\n", getpid(), PORT);
-    sv_listen(sv_pipe[1], PORT);
   }
 
   return 0;
