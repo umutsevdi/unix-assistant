@@ -64,14 +64,12 @@ int main(int argc, char *argv[]) {
   }
 
   int connected = 1;
-  while (printf("waiting for a command : ") && fgets(buffer, MAXLINE, stdin) &&
-         connected) {
-    nWrite = send(sockfd, buffer, strlen(buffer), 0);
-    if (nWrite < 0) {
-      perror("Error: send failed...\n");
-      connected = 0;
-    }
-    if (strncpy(buffer, "exit", 4) == 0) {
+  while (connected) {
+    printf("$> ");
+    fgets(buffer, MAXLINE, stdin);
+    int len = strnlen(buffer, MAXLINE);
+    nWrite = send(sockfd, buffer, len, 0);
+    if (nWrite < 0 || strncmp(buffer, "exit", 4) == 0) {
       connected = 0;
     }
   }
