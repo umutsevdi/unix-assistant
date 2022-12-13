@@ -9,7 +9,7 @@
 
 #define PORT 8081
 
-#define HOSTNAME "pi.local"
+#define HOSTNAME "pi2.local"
 #define MAXLINE 256
 
 /**
@@ -38,7 +38,8 @@ int main(int argc, char *argv[]) {
   strncpy(ip, sv_ip_address, 15);
 
   if (sv_ip_address == NULL) {
-    perror("Error while finding given hostname " HOSTNAME ", no such entry\n");
+    perror("Error: Hostname " HOSTNAME ", were not found\n");
+    exit(0);
   }
 
   char buffer[MAXLINE];
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]) {
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) {
-    perror("ERR>> socket creation failed");
+    perror("Error: socket creation failed");
     exit(0);
   }
 
@@ -58,13 +59,20 @@ int main(int argc, char *argv[]) {
   // Binding newly created socket to given IP and verification
 
   if (connect(sockfd, (struct sockaddr *)&servAddr, sizeof(servAddr)) != 0) {
-    perror("ERR>> connection failed");
-    exit(1);
+    perror("Error: connection failed");
+    exit(0);
   }
-  while (printf("waiting for a command : ") && fgets(buffer, MAXLINE, stdin)) {
+
+  int connected = 1;
+  while (printf("waiting for a command : ") && fgets(buffer, MAXLINE, stdin) &&
+         connected) {
     nWrite = send(sockfd, buffer, strlen(buffer), 0);
     if (nWrite < 0) {
-      perror("ERR>> send failed...\n");
+      perror("Error: send failed...\n");
+      connected = 0;
+    }
+    if (strncpy(buffer, "exit", 4) == 0) {
+      connected = 0;
     }
   }
   close(sockfd);
