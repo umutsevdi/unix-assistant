@@ -8,8 +8,6 @@
 #include <unistd.h> // read(), write(), close()
 
 #define PORT 8081
-
-#define HOSTNAME "pi2.local"
 #define MAXLINE 256
 
 /**
@@ -27,18 +25,28 @@ char *get_ip_by_hostname(char *hostname) {
 }
 
 int main(int argc, char *argv[]) {
-
+  int i = 0;
   int sockfd, opt;
   int argCnt = 0, nRead, nWrite;
   struct sockaddr_in servAddr;
   struct hostent *servName;
   char ip[16];
-
-  char *sv_ip_address = get_ip_by_hostname(HOSTNAME);
+  printf("hostname: ");
+  char hostname[256];
+  fgets(hostname, 255, stdin);
+  int found = 0;
+  while (!found && i < 256) {
+    if (hostname[i] == '\n') {
+      hostname[i] = '\0';
+      found = 1;
+    }
+    i++;
+  }
+  char *sv_ip_address = get_ip_by_hostname(hostname);
   strncpy(ip, sv_ip_address, 15);
 
   if (sv_ip_address == NULL) {
-    perror("Error: Hostname " HOSTNAME ", were not found\n");
+    printf("Error: Hostname %s, were not found\n", hostname);
     exit(0);
   }
 
@@ -65,7 +73,7 @@ int main(int argc, char *argv[]) {
 
   int connected = 1;
   while (connected) {
-    printf("$> ");
+    printf("%s$> ", hostname);
     fgets(buffer, MAXLINE, stdin);
     int len = strnlen(buffer, MAXLINE);
     nWrite = send(sockfd, buffer, len, 0);
