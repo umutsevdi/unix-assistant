@@ -1,3 +1,4 @@
+print("STARTING IMPORTING LIBRARIES")
 import speech_recognition as sr
 import time
 import pyaudio
@@ -9,10 +10,9 @@ import socket
 import numpy as np
 print("STARTING")
 # Set up the Raspberry Pi's GPIO pins
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#   GPIO.setmode(GPIO.BOARD)
+#   GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-print("TEST")
 # Set the recording parameters
 samplerate = 44100
 duration = 5
@@ -27,7 +27,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # connect to the server
 print("SOCKET CONNECTED")
 sock.connect((IP, PORT))
-print("CONNECTING TO" + IP + ":" + PORT)
+print("CONNECTING TO" + str(IP) + ":" + str(PORT))
 r = sr.Recognizer()
 
 
@@ -55,12 +55,17 @@ directory = {
     "process":"ps ",
     "touch":"touch ",
     "echo":"echo ",
+    "clear":"clear ",
+    "exit":"exit ",
+    "directory":"dir ",
+    "unix_name":"uname ",
     #parameters
 
     "recursive":"-r ",
     "verbose":"-v ", 
     "help":"-h ",
     "force":"-f ",
+    "all":"--all ",
     
 }
     
@@ -71,6 +76,7 @@ def text_processor(string):
     output = ""
     speacial_cases = ["change","make"]
     for word in string.split():
+        word=word.lower()
         new_str+=word
         if word in speacial_cases:
             new_str+="_"  
@@ -81,14 +87,15 @@ def text_processor(string):
     for word in new_str.split():
 
         if word in directory:
-            word = directory[word]
+            word = directory[word] + " "
         output += word
     return output
     
 
 
 while True:
-    if not GPIO.input(23):
+    if input("Waiting for action") is not None:
+        # not GPIO.input(23):
         record_audio()
         with sr.WavFile("recording.wav") as source:             
             audio = r.record(source)            
@@ -104,6 +111,4 @@ while True:
             print("Sorry, I didn't catch that.")
         except sr.RequestError as e:
             print(f"Sorry, there was an error: {e}")
-    break
-
 
