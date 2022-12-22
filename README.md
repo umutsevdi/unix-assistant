@@ -25,7 +25,8 @@ A voice assistant tool on OLED displays for running shell commands
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
-<img src="screenshot/program1.png" width=512px>
+
+<p align="center"><img src="screenshot/program1.png" width=512px></p>
 
 <p id="project_definition">
 
@@ -125,7 +126,7 @@ end of the pipe, while the display program takes the reading end.
   - If none of these conditions are met, the message is simply written to the OLED
     screen.
 
-    <img src="screenshot/program2.png" width="512px">
+<p align="center"><img src="screenshot/program2.png" width="512px"></p>
 
 - #### TCP Server Process
 
