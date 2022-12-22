@@ -11,8 +11,8 @@ SRC=src
 # ************************************************
 
 CC=g++
-LDFLAGS= -lbcm2835 -lrt -lSSD1306_OLED_RPI 
-CFLAGS = -Iheader/ -c -Wall 
+LDFLAGS= -lbcm2835 -lrt -lSSD1306_OLED_RPI -lpthread
+CFLAGS = -Iheader/ -c -Wall
 MD=mkdir
 OBJ=obj
 SRCS = $(wildcard $(SRC)/*.cpp)
