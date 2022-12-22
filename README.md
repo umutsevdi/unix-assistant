@@ -48,7 +48,7 @@ Our software is written in C, C++ and Python. Voice recording and processing is 
 in Python. Everything related to the OLED display is done in C and C++.
 
 After successfully processing the voice data, the text is transferred through sockets
-to the C program. The C program then executes the incoming command in a seperate
+to the C program. The C program then executes the incoming command in a separate
 process and it's result is transferred to the main program via pipes. When the command
 and it's result is obtained, they are both printed to the OLED screen on the current
 cursor position.
@@ -106,18 +106,18 @@ end of the pipe, while the display program takes the reading end.
   - If the message is "clear", the OLED screen is cleared.
   - If not, the display cursor is placed at the y_index * 8 % 64 position
     it should be. It then calls the function
-    `char *proc_exec(char \*const program, int len)`defined in proc_util.
+    `char *proc_exec(char *const program, int len)`defined in `proc_util`.
 
     "proc_exec" first calls the function
     `char **proc_split(const char *const string, int len, int *argc)` defined
     in the same header. This function parses the given string into a program
     and arguments.
 
-  - After the parsing is complete, proc_exec creates a new process and executes the
-    program and argument data of the process. It redirects `stdout` and `stderr`
+  - After the parsing is complete, `proc_exec` creates a new process and executes
+    the program and argument data of the process. It redirects `stdout` and `stderr`
     channels to the write end of the pipe. This allows the output of the
     created process to be stored in a string.
-  - disp_loop writes the program name and result obtained to the OLED buffer
+  - `disp_loop` writes the program name and result obtained to the OLED buffer
     and updates the screen. If the screen overflows as a result, the screen is cleared.
   - If the message is "exit", the OLED screen and TCP server processes are
     terminated instead of the shell's exit command. OLED and TCP are terminated by
@@ -161,7 +161,7 @@ which is the 6th pin.
 
    - C Dependencies:
 
-     - [bcm2835](https://www.airspayce.com/mikem/bcm2835/).
+     - [bcm2835](https://www.airspayce.com/mikem/bcm2835/)
      - [SSD1306_OLED_RPI](https://github.com/gavinlyonsrepo/SSD1306_OLED_RPI)
 
    - Python Dependencies:
@@ -173,9 +173,10 @@ which is the 6th pin.
      - PyAudio
 
    - Additional Dependencies:
-     ```sh
-     sudo apt install portaudio19-dev python3-pyaudio
-     ```
+
+```sh
+sudo apt install portaudio19-dev python3-pyaudio
+```
 
 3. Compile the C++ program.
 
