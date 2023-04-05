@@ -59,12 +59,11 @@ int main(int argc, char *argv[]) {
     i++;
   }
   char *host_ip = get_ip_by_hostname(hostname);
-  strncpy(ip, host_ip, 15);
-
   if (host_ip == NULL) {
     printf("Error: Hostname %s, were not found\n", hostname);
     exit(0);
   }
+  strncpy(ip, host_ip, 15);
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) {
